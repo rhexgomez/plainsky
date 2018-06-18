@@ -17,6 +17,7 @@
 package com.rhexgomez.plainsky.source
 
 import com.rhexgomez.plainsky.util.forEachObject
+import com.rhexgomez.plainsky.util.guaranteeString
 import com.rhexgomez.plainsky.util.toFileText
 import org.json.JSONArray
 import org.json.JSONObject
@@ -46,12 +47,16 @@ class JsonQueryImpl(uri: String) : JsonQuery {
                                 val property = it.next()
                                 val value = it.next()
 
-                                currentJson = null
-
                                 run breaker@{
-                                    forEachObject {
-                                        if (it.get(property) == value) currentJson = it
+
+                                    forEachObject { jsonObject ->
+
+                                        if (jsonObject.get(property).guaranteeString() == value) {
+                                            currentJson = jsonObject
+                                            return@breaker
+                                        }
                                     }
+                                    currentJson = null
                                 }
                             }
                         }
