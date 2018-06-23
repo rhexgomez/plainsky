@@ -16,10 +16,12 @@
 
 package com.rhexgomez.plainsky.source
 
+import com.rhexgomez.plainsky.exception.PlainskyFileNotFoundException
 import com.rhexgomez.plainsky.util.*
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
+import java.io.FileNotFoundException
 
 class JsonQueryImpl(uri: String) : JsonQuery {
 
@@ -68,15 +70,15 @@ class JsonQueryImpl(uri: String) : JsonQuery {
         if (path == "/") return currentJson?.toString()
         path.substring(1).split("/").iterator().let { path ->
             while (path.hasNext()) {
-                currentJson = currentJson?.run { move(this, path) }
+                currentJson = currentJson?.run { move(this, path) } ?: PlainskyFileNotFoundException()
             }
         }
         return currentJson?.toString()
     }
 
-    private fun move(currentJson: Any, path: Iterator<String>): Any {
+    private fun move(currentJson: Any, path: Iterator<String>): Any? {
         if (currentJson is JSONObject) {
-            return currentJson.getWithError(path.next())
+            return currentJson.getWithError(key = path.next())
         } else if (currentJson is JSONArray) {
             val property = path.next()
             return if (path.hasNext()) {

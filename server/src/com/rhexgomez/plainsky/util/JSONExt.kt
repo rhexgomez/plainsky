@@ -80,11 +80,11 @@ fun JSONArray.createArrayOf(key: String): JSONArray {
     return newArray
 }
 
-fun JSONArray.searchObject(key: String, value: String): JSONObject {
+fun JSONArray.searchObject(key: String, value: String): JSONObject? {
     iterateObject {
         (it as? JSONObject)?.run {
             if (getWithError(key).guaranteeString() == value) return this
         }
     }
-    throw PlainskyFileNotFoundException()
+    return null
 }
